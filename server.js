@@ -2,17 +2,10 @@ const express = require('express');
 const cors = require('cors');
 
 const { google } = require('googleapis')
+const nodemailer = require('nodemailer');
+const axios = require('axios');
 
 const app = express();
-
-const {
-    REACT_APP_PRIVATE_KEY,
-    REACT_APP_CLIENT_EMAIL,
-    REACT_APP_SPREADSHEET_ID,
-    REACT_APP_SHEET_ID
-} = process.env
-
-
 
 // Middleware
 
@@ -25,6 +18,14 @@ app.use(
     credentials: true
 }))
 
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+    user: 'kata7299@gmail.com',
+     pass: 'ovjpqfsflgeqxqdz'
+    }
+});
+
 // End of middleware
 
 app.get('/', function (req, res) {
@@ -32,7 +33,6 @@ app.get('/', function (req, res) {
 })
 
 app.post('/submit', async (req, res) => {
-    const { request, name } = req.body;
 
     const auth = new google.auth.GoogleAuth({
         keyFile: "./googleCredentials/credentials.json", //the key file
@@ -59,6 +59,45 @@ app.post('/submit', async (req, res) => {
         res.status(200).send({ message: 'Form data submitted successfully!' })
     });
 })
+
+app.post('/send-email', (req, res) => {
+    // Get the email data from the request body
+    const emailData = req.body;
+  
+    // Define the email options
+    const mailOptions = {
+      from: 'kata7299@gmail.com',
+      to: emailData.to,
+      subject: emailData.subject,
+      html: emailData.message
+    };
+  
+    // Send the email
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Failed to send email' });
+      } else {
+        console.log('Email sent: ' + info.response);
+        res.status(200).json({ message: 'Email sent successfully' });
+      }
+    });
+});
+
+app.post("/postToken", async (req, res) => {
+//Destructuring response token from request body
+    const {token} = req.body;
+
+//sends secret key and response token to google
+    await axios.post(`https://www.google.com/recaptcha/api/siteverify?secret=6Lc1hx0kAAAAAP9Q8dRjLa6tnut21sxNSRfM0mL7&response=${token}`)
+        .then(response => {
+            if(response.data.success === true) {
+                res.status(200).send({ message: 'reCaptcha verification worked' })
+            } else {
+                res.status(500).send({ message: 'reCaptcha verification worked' })
+            }
+        })
+});
 
 app.listen(5000, () => {
     console.log('Server started on port 5000')

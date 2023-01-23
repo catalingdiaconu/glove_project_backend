@@ -18,10 +18,12 @@
   },
   "homepage": "https://github.com/catalingdiaconu/glove_project_backend#readme",
   "dependencies": {
+    "axios": "^1.2.3",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "google-auth-library": "^8.7.0",
     "googleapis": "^110.0.0",
+    "nodemailer": "^6.9.0",
     "nodemon": "^2.0.20"
   }
 }
