@@ -55,7 +55,7 @@ app.post('/submit', async (req, res) => {
             values: [req.body],
         }, 
     },  (err, response) => {
-        if (err) return console.log(`The API returned an error: ${err}`)
+        if (err) return console.log(`The Spreadsheet API returned an error: ${err}`)
         res.status(200).send({ message: 'Form data submitted successfully!' })
     });
 })
@@ -94,7 +94,7 @@ app.post("/postToken", async (req, res) => {
             if(response.data.success === true) {
                 res.status(200).send({ message: 'reCaptcha verification worked' })
             } else {
-                res.status(500).send({ message: 'reCaptcha verification worked' })
+                res.status(500).send({ message: 'reCaptcha verification failed' })
             }
         })
 });
